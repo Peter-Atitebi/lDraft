@@ -1,0 +1,262 @@
+/* BRAND COLORS:
+   #061222 (Black/Dark Blue) - Primary Dark
+   #447794 (Azure Blue) - Accent
+   #FFFFFF (White) - Primary Light
+*/
+
+/* RESET */
+body {
+    margin: 0;
+    background-color: #061222; /* Use dark color for outer body */
+    font-family: sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* TOOLBAR */
+.toolbar {
+    background: #061222; /* Dark background */
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #447794; /* Accent line */
+    z-index: 100;
+}
+.brand {
+    font-weight: bold;
+    font-size: 18px;
+    color: #FFFFFF; /* White text on dark toolbar */
+    margin-right: auto;
+}
+
+/* CONTROLS (Font, Size, Spacing) */
+.controls {
+    display: flex;
+    gap: 15px; 
+    align-items: center;
+    flex-wrap: wrap; 
+}
+.controls select, .controls input {
+    background-color: #FFFFFF;
+    color: #061222;
+    border: 1px solid #447794;
+    padding: 6px;
+    border-radius: 3px;
+}
+
+/* ACCENT BUTTONS */
+.magic-btn {
+    background: #447794; /* Azure Blue Accent */
+    color: #FFFFFF;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.2s;
+}
+.magic-btn:hover {
+    background: #5b90b1; /* Slightly lighter accent on hover */
+}
+.download-btn {
+    background: #447794; /* Azure Blue Accent */
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.download-btn:hover {
+    background: #5b90b1;
+}
+
+.divider {
+    color: #447794; /* Azure Blue divider */
+    font-size: 20px;
+    margin: 0 5px;
+}
+
+.size-input {
+    width: 60px !important; 
+    text-align: center;
+}
+
+/* WORKSPACE */
+.workspace {
+    flex: 1;
+    background-color: #061222; /* Dark background surrounding the paper */
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    padding: 40px 10px;
+}
+
+/* PAPER SHEET */
+.paper-container {
+    width: 210mm; 
+    max-width: 95%; 
+    min-height: 297mm;
+    background-color: #FFFFFF !important; /* White paper */
+    color: #061222 !important; /* Dark text on white paper */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5); /* Strong shadow */
+    padding: 25mm; 
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+/* TABS (Edit/Preview) */
+.mode-toggle {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #061222;
+}
+.mode-toggle button {
+    background: transparent;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #447794; /* Accent color for inactive tab */
+}
+.mode-toggle button.active-tab {
+    color: #061222; /* Dark text for active tab */
+    border-bottom: 2px solid #447794; /* Accent underline */
+    margin-bottom: -2px; 
+}
+
+/* EDITOR & PREVIEW */
+.real-paper-editor {
+    flex: 1;
+    width: 100%;
+    min-height: 600px;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent !important;
+    color: #061222 !important; 
+    white-space: pre-wrap;
+}
+.preview-box {
+    width: 100%;
+    min-height: 600px; 
+    white-space: pre-wrap;
+    color: #061222;
+}
+
+/* --- WHATSAPP BRANDED BANNER --- */
+.whatsapp-banner {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #447794; /* Azure Blue Background */
+    color: #FFFFFF;
+    border-radius: 8px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 1000; /* Ensure it stays above everything */
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.banner-text a {
+    color: #061222; /* Dark Blue/Black for contrast link */
+    text-decoration: underline;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: #061222; /* Dark Blue/Black for the close button */
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    margin-left: -10px;
+}
+
+/* --- RESPONSIVENESS (Media Queries) --- */
+
+@media (max-width: 900px) {
+    /* 1. Adjust Paper Size for mid-range screens (tablets) */
+    .paper-container {
+        width: 190mm; /* Slightly smaller paper on tablets */
+        padding: 20mm;
+    }
+}
+
+@media (max-width: 600px) {
+    /* 2. Mobile-Specific Adjustments */
+
+    /* Toolbar Layout */
+    .toolbar {
+        flex-direction: column; /* Stack items vertically */
+        padding: 10px;
+        gap: 10px;
+    }
+    .brand {
+        margin-right: 0;
+        text-align: center;
+    }
+    .controls {
+        width: 100%;
+        justify-content: center; /* Center the controls group */
+    }
+    .download-btn {
+        width: 100%; /* Full width for the download button */
+    }
+    .magic-btn {
+        flex-grow: 1; /* Allow auto-format button to fill space */
+    }
+
+    /* Paper/Workspace Adjustment */
+    .workspace {
+        padding: 10px 0; /* Reduce padding around the paper */
+    }
+    .paper-container {
+        width: 100%; /* Full width on mobile */
+        min-height: 100vh; /* Fill the screen height */
+        padding: 15px; /* Smaller padding on the "paper" */
+        box-shadow: none; /* Remove box shadow for simplicity */
+        margin: 0;
+    }
+    
+    /* Hide non-essential inputs on mobile to save space */
+    .controls select, 
+    .controls input {
+        font-size: 12px;
+        padding: 4px;
+    }
+
+    /* WhatsApp Banner Relocation */
+    .whatsapp-banner {
+        right: 10px;
+        bottom: 10px;
+        left: 10px; /* Make the banner span the full width of the screen */
+        padding: 12px;
+        font-size: 12px;
+    }
+    .close-btn {
+        /* Move close button to the left/start */
+        margin-right: 5px; 
+    }
+}
