@@ -165,8 +165,26 @@ function App() {
     });
   };
 
-  const downloadPDF = () => {
-    alert("Connect this to your backend axios call for PDF download");
+  const downloadPDF = async () => {
+    try {
+      const cleanContent = sanitizeText(content);
+
+      const response = await axios.post(
+        "http://localhost:5000/create-pdf",
+        { content: cleanContent, settings },
+        { responseType: "blob" }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "project.pdf");
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error(error);
+      alert("Server Error. Check if backend is running.");
+    }
   };
 
   return (
