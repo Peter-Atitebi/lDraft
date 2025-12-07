@@ -380,7 +380,7 @@ function App() {
               <div style={styles.brandSection}>
                 <img src="/lDraft.png" alt="lDraft Logo" style={styles.logo} />
                 <div>
-                  <div style={styles.brand}>lDraft</div>
+                  <div style={styles.brand}>lDraft - Powered By Lithora</div>
                   <div style={styles.brandSubtitle}>APA Format Assistant</div>
                 </div>
               </div>
