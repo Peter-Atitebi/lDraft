@@ -167,23 +167,166 @@ function App() {
 
   const downloadPDF = async () => {
     try {
-      const cleanContent = sanitizeText(content);
+      if (!window.jspdf) {
+        const script = document.createElement("script");
+        script.src =
+          "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+        script.onload = () => setTimeout(downloadPDF, 100);
+        document.head.appendChild(script);
+        return;
+      }
 
-      const response = await axios.post(
-        "http://localhost:5000/create-pdf",
-        { content: cleanContent, settings },
-        { responseType: "blob" }
-      );
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4",
+      });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "project.pdf");
-      document.body.appendChild(link);
-      link.click();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 72;
+      const maxWidth = pageWidth - 2 * margin;
+
+      const fontName = settings.font === "Times-Roman" ? "times" : "helvetica";
+      const fontSize = parseInt(settings.fontSize);
+      const lineHeight = fontSize * parseFloat(settings.lineSpacing);
+
+      let y = margin;
+
+      const addNewPage = () => {
+        doc.addPage();
+        y = margin;
+      };
+
+      const checkPageBreak = (neededSpace) => {
+        if (y + neededSpace > pageHeight - margin) {
+          addNewPage();
+        }
+      };
+
+      const processStyledText = (line) => {
+        const parts = line.split(/(_[^_]+_|\*[^*]+\*)/g);
+        const segments = [];
+
+        parts.forEach((part) => {
+          if (!part) return;
+
+          let style = "normal";
+          let text = part;
+
+          if (part.startsWith("_") && part.endsWith("_")) {
+            style = "italic";
+            text = part.slice(1, -1);
+          } else if (part.startsWith("*") && part.endsWith("*")) {
+            style = "bold";
+            text = part.slice(1, -1);
+          }
+
+          segments.push({ text, style });
+        });
+
+        return segments;
+      };
+
+      const writeSegments = (segments, align = "left") => {
+        doc.setFontSize(fontSize);
+
+        if (align === "center") {
+          const fullText = segments.map((s) => s.text).join("");
+          doc.setFont(fontName, segments[0]?.style || "normal");
+          const textWidth = doc.getTextWidth(fullText);
+          doc.text(fullText, (pageWidth - textWidth) / 2, y);
+          y += lineHeight;
+          return;
+        }
+
+        let currentX = margin;
+        let lineWords = [];
+        let lineStyles = [];
+
+        segments.forEach((segment) => {
+          const words = segment.text.split(" ");
+          words.forEach((word, idx) => {
+            doc.setFont(fontName, segment.style);
+            const wordText =
+              idx < words.length - 1 || segment.text.endsWith(" ")
+                ? word + " "
+                : word;
+            const wordWidth = doc.getTextWidth(wordText);
+
+            if (
+              currentX + wordWidth > pageWidth - margin &&
+              lineWords.length > 0
+            ) {
+              // Render current line
+              let renderX = margin;
+              lineWords.forEach((w, i) => {
+                doc.setFont(fontName, lineStyles[i]);
+                doc.text(w, renderX, y);
+                renderX += doc.getTextWidth(w);
+              });
+              y += lineHeight;
+              checkPageBreak(lineHeight);
+              lineWords = [wordText];
+              lineStyles = [segment.style];
+              currentX = margin + wordWidth;
+            } else {
+              lineWords.push(wordText);
+              lineStyles.push(segment.style);
+              currentX += wordWidth;
+            }
+          });
+        });
+
+        // Render remaining line
+        if (lineWords.length > 0) {
+          let renderX = margin;
+          lineWords.forEach((w, i) => {
+            doc.setFont(fontName, lineStyles[i]);
+            doc.text(w, renderX, y);
+            renderX += doc.getTextWidth(w);
+          });
+          y += lineHeight;
+        }
+      };
+
+      const lines = sanitizeText(content).split("\n");
+
+      lines.forEach((line, index) => {
+        const cleanLine = line.trim();
+
+        if (!cleanLine) {
+          y += lineHeight * 0.5;
+          checkPageBreak(lineHeight);
+          return;
+        }
+
+        const upperLine = cleanLine.toUpperCase();
+        const isChapterOrRef =
+          upperLine.startsWith("CHAPTER") || upperLine === "REFERENCES";
+
+        if (isChapterOrRef && index > 0) {
+          addNewPage();
+        }
+
+        if (isChapterOrRef) {
+          doc.setFont(fontName, "bold");
+          doc.setFontSize(fontSize);
+          const textWidth = doc.getTextWidth(cleanLine);
+          doc.text(cleanLine, (pageWidth - textWidth) / 2, y);
+          y += lineHeight * 1.5;
+          checkPageBreak(lineHeight);
+        } else {
+          const segments = processStyledText(cleanLine);
+          writeSegments(segments, "left");
+          checkPageBreak(lineHeight);
+        }
+      });
+
+      doc.save("project.pdf");
     } catch (error) {
       console.error(error);
-      alert("Server Error. Check if backend is running.");
     }
   };
 
